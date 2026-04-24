@@ -51,6 +51,8 @@ export function sleep(ms: number): Promise<void> {
  * detail URL, e.g. `.../fighter-details/07c55e76efe5ea25` → `07c55e76efe5ea25`.
  */
 export function extractSourceId(url: string): string | null {
-  const m = url.match(/-details\/([a-f0-9]+)/i);
+  // Real UFCStats ids are hex, but we accept any path-safe id here so the
+  // parser tolerates fixture/seed urls that use synthetic ids.
+  const m = url.match(/-details\/([A-Za-z0-9_-]+)/);
   return m ? m[1] : null;
 }

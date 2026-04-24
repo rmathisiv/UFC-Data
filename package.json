@@ -9,7 +9,9 @@
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
     "test": "tsx --test 'src/**/__tests__/**/*.test.ts'",
-    "scrape:fighters": "tsx scripts/scrape-fighters.ts"
+    "scrape:fighters": "tsx scripts/scrape-fighters.ts",
+    "scrape:events": "tsx scripts/scrape-events.ts",
+    "scrape:event-fights": "tsx scripts/scrape-event-fights.ts"
   },
   "dependencies": {
     "@supabase/ssr": "^0.10.2",
