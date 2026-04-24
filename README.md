@@ -48,28 +48,39 @@ Schema is defined in:
 ## Scripts
 
 ```bash
-npm run dev              # next dev
-npm run build            # next build
-npm run typecheck        # tsc --noEmit
-npm test                 # node:test runner
-npm run scrape:fighters  # scrape UFCStats fighter pages
+npm run dev                   # next dev
+npm run build                 # next build
+npm run typecheck             # tsc --noEmit
+npm test                      # node:test runner
+npm run scrape:fighters       # fighter-details → fighters
+npm run scrape:events         # events list → events
+npm run scrape:event-fights   # event-details → fights (+ fighter placeholders)
+npm run scrape:fight          # fight-details → fight_results + fight_stats
 ```
 
-### scrape:fighters
+### Backfill workflow
 
-Scrapes a UFCStats fighter-details page, normalizes into `ScrapedFighter`,
-and upserts into the `fighters` table keyed on `ufcstats_id`.
+Run once to populate history, in order:
 
 ```bash
-# default: 10-fighter smoke-test seed list
-npm run scrape:fighters
-
-# specific URLs
-npm run scrape:fighters -- http://www.ufcstats.com/fighter-details/07c55e76efe5ea25
+npm run scrape:events                 # all completed UFCStats events
+npm run scrape:event-fights           # for every event missing fights
+npm run scrape:fight                  # every completed fight missing fight_results
+npm run scrape:fighters               # fill in vitals for fighter placeholders
 ```
 
-Throttled to 750ms between requests. UFCStats has no public API and no
-documented rate limit — be polite.
+Each step is idempotent on its source id, so re-running is safe. Scripts
+throttle at 750ms between requests — UFCStats has no documented rate limit,
+be polite.
+
+### Targeted scrapes
+
+```bash
+npm run scrape:fighters -- http://www.ufcstats.com/fighter-details/07c55e76efe5ea25
+npm run scrape:events -- --upcoming
+npm run scrape:event-fights -- <ufcstats_event_id>
+npm run scrape:fight -- <ufcstats_fight_id>
+```
 
 ## Project layout
 
@@ -80,6 +91,9 @@ src/
       types.ts                  # shared normalized shapes
       ufcstats/
         fetch.ts                # HTML fetch + helpers
+        events.ts               # events-list parser (completed / upcoming)
+        event.ts                # event-details parser (event + fights)
+        fight.ts                # fight-details parser (result + stats)
         fighter.ts              # fighter-details parser
         __tests__/              # parser unit tests
     supabase/
