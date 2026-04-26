@@ -56,7 +56,26 @@ npm run scrape:fighters       # fighter-details → fighters
 npm run scrape:events         # events list → events
 npm run scrape:event-fights   # event-details → fights (+ fighter placeholders)
 npm run scrape:fight          # fight-details → fight_results + fight_stats
+npm run snapshot:odds         # the-odds-api → odds_snapshots
 ```
+
+### Odds snapshots
+
+Run during fight week to capture sportsbook prices over time. Defaults to
+moneyline on DraftKings / FanDuel / BetMGM (per the books locked in for
+launch). Each run is one The Odds API credit.
+
+```bash
+npm run snapshot:odds                      # h2h, default books
+npm run snapshot:odds -- --books all       # don't filter books
+npm run snapshot:odds -- --markets h2h     # explicit markets
+```
+
+The script matches API events to DB fights by normalized fighter-name
+pair (case- and diacritic-insensitive); rematches are disambiguated by
+nearest scheduled_at. Unmatched events are logged but don't block the
+insert. `odds_snapshots` is append-only — the captured_at column on each
+row is the snapshot timestamp.
 
 ### Backfill workflow
 
@@ -101,6 +120,12 @@ src/
       browser.ts                # browser client (anon)
       server.ts                 # SSR client (anon + cookies)
       admin.ts                  # service-role client (scripts only)
+    odds/
+      env.ts                    # ODDS_API_KEY accessor
+      match.ts                  # name normalize + DB-fight matcher
+      the-odds-api/
+        client.ts               # fetchMmaOdds wrapper
+        types.ts                # response shapes
 scripts/
   scrape-fighters.ts            # CLI entry to scrape + upsert
 supabase/

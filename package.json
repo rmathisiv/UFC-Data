@@ -12,7 +12,8 @@
     "scrape:fighters": "tsx scripts/scrape-fighters.ts",
     "scrape:events": "tsx scripts/scrape-events.ts",
     "scrape:event-fights": "tsx scripts/scrape-event-fights.ts",
-    "scrape:fight": "tsx scripts/scrape-fight.ts"
+    "scrape:fight": "tsx scripts/scrape-fight.ts",
+    "snapshot:odds": "tsx scripts/snapshot-odds.ts"
   },
   "dependencies": {
     "@supabase/ssr": "^0.10.2",
